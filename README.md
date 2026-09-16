@@ -52,7 +52,6 @@ Es la lógica clave del sistema. El prefecto carga el Dashboard:
     - Filtra alumnos del grupo en horario de clase.
     - Detecta quiénes NO tienen `AsistenciaClase` registrada como PRESENTE.
 3.  Retorna lista de alumnos en discrepancia y muestra alerta en rojo: **"Alumno X está en la escuela pero no en clase"**
-
 ```mermaid
 sequenceDiagram
     participant A as Alumno
@@ -71,7 +70,7 @@ sequenceDiagram
         N-->>A: 6. Feedback visual en pantalla (Verde / Sonido)
     end
 
-    rect rgb(173, 216, 230)
+    rect rgb(21, 190, 247)
         Note over M, DB: 2. TOMA DE ASISTENCIA EN CLASE
         M->>N: 7. Selecciona su Clase (id_materia, id_grupo)
         N->>DB: 8. Clase.findUnique() + Alumnos del grupo
@@ -81,7 +80,7 @@ sequenceDiagram
         DB-->>N: 12. Registros guardados
     end
 
-    rect rgb(255, 204, 203)
+    rect rgb(250, 77, 74)
         Note over P, DB: 3. DASHBOARD DE PREFECTURA
         P->>N: 13. Carga / Actualiza Dashboard de Prefectura
         N->>DB: 14. Consulta asistencias cruzadas
