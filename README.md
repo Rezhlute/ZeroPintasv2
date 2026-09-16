@@ -52,3 +52,41 @@ Es la lógica clave del sistema. El prefecto carga el Dashboard:
     - Filtra alumnos del grupo en horario de clase.
     - Detecta quiénes NO tienen `AsistenciaClase` registrada como PRESENTE.
 3.  Retorna lista de alumnos en discrepancia y muestra alerta en rojo: **"Alumno X está en la escuela pero no en clase"**
+
+```mermaid
+sequenceDiagram
+    participant A as Alumno
+    participant M as Maestro
+    participant P as Prefecto
+    participant N as Next.js (Server Actions/API)
+    participant DB as Prisma + DB
+
+    rect rgb(255, 255, 204)
+        Note over A, DB: 1. REGISTRO DE ENTRADA A ESCUELA
+        A->>N: 1. Escanea credencial (Código de Barras)
+        N->>DB: 2. Alumno.findUnique({ where: { codigoBarras } })
+        DB-->>N: 3. Regresa datos del Alumno (id_alumno)
+        N->>DB: 4. RegistroEntradaEscuela.create({ idAlumno, fechaHora: now() })
+        DB-->>N: 5. Confirmación de registro
+        N-->>A: 6. Feedback visual en pantalla (Verde / Sonido)
+    end
+
+    rect rgb(173, 216, 230)
+        Note over M, DB: 2. TOMA DE ASISTENCIA EN CLASE
+        M->>N: 7. Selecciona su Clase (id_materia, id_grupo)
+        N->>DB: 8. Clase.findUnique() + Alumnos del grupo
+        DB-->>N: 9. Lista de alumnos inscritos
+        M->>N: 10. Marca estatus (PRESENTE/AUSENTE) y guarda
+        N->>DB: 11. AsistenciaClase.createMany()
+        DB-->>N: 12. Registros guardados
+    end
+
+    rect rgb(255, 204, 203)
+        Note over P, DB: 3. DASHBOARD DE PREFECTURA
+        P->>N: 13. Carga / Actualiza Dashboard de Prefectura
+        N->>DB: 14. Consulta asistencias cruzadas
+        Note over N, DB: 1. Busca entradas a la escuela de hoy.<br/>2. Filtra alumnos del grupo en horario de clase.<br/>3. Detecta quiénes NO tienen AsistenciaClase como PRESENTE.
+        DB-->>N: 15. Retorna lista de alumnos en discrepancia
+        N-->>P: 16. Muestra alerta en rojo: "Alumno X está en la escuela pero no en clase"
+    end
+```
